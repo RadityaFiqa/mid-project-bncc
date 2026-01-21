@@ -19,5 +19,8 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        // Run large dataset seeder manually when needed:
+        // php artisan db:seed --class=Database\\Seeders\\LargeDatasetSeeder
     }
 }

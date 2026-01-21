@@ -3,7 +3,6 @@ import {
     BookOpenIcon,
     CalendarIcon,
     LibraryIcon,
-    TagIcon,
     UsersIcon,
 } from 'lucide-react';
 import {
@@ -34,7 +33,6 @@ import {
 } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/borrowings';
-import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 
 interface Book {
@@ -82,7 +80,7 @@ interface BooksByCategory {
     value: number;
 }
 
-interface DashboardProps {
+interface BorrowingDashboardProps {
     stats: {
         total_borrowings: number;
         active_borrowings: number;
@@ -92,7 +90,6 @@ interface DashboardProps {
         active_members: number;
         total_books: number;
         available_books: number;
-        total_categories: number;
     };
     recentBorrowings: Borrowing[];
     topBorrowedBooks: TopBorrowedBook[];
@@ -102,29 +99,27 @@ interface DashboardProps {
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard().url,
-    },
+    { title: 'Borrowings', href: index().url },
+    { title: 'Dashboard' },
 ];
 
-export default function Dashboard({
+export default function BorrowingDashboard({
     stats,
     recentBorrowings,
     topBorrowedBooks,
     monthlyBorrowings,
     statusDistribution,
     booksByCategory,
-}: DashboardProps) {
+}: BorrowingDashboardProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Dashboard" />
+            <Head title="Borrowing Dashboard" />
 
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <Heading
-                        title="Dashboard"
-                        description="Overview of library management system"
+                        title="Borrowing Dashboard"
+                        description="Statistics and overview of borrowing activities"
                     />
                     <Button variant="outline" asChild>
                         <Link href={index().url}>View All Borrowings</Link>
@@ -186,17 +181,114 @@ export default function Dashboard({
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">
-                                Total Books
+                                Books Borrowed
                             </CardTitle>
                             <LibraryIcon className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">
-                                {stats.total_books}
+                                {stats.total_books_borrowed}
                             </div>
                             <p className="text-xs text-muted-foreground">
-                                {stats.available_books} available
+                                Currently out
                             </p>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <div className="grid gap-6 md:grid-cols-2">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Recent Borrowings</CardTitle>
+                            <CardDescription>
+                                Latest 5 borrowing transactions
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {recentBorrowings.length === 0 ? (
+                                <p className="text-sm text-muted-foreground">
+                                    No recent borrowings.
+                                </p>
+                            ) : (
+                                <div className="space-y-3">
+                                    {recentBorrowings.map((borrowing) => (
+                                        <div
+                                            key={borrowing.id}
+                                            className="flex items-start justify-between rounded-lg border p-3"
+                                        >
+                                            <div className="flex-1">
+                                                <p className="text-sm font-medium">
+                                                    {borrowing.member.name}
+                                                </p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    {borrowing.member.member_code}{' '}
+                                                    •{' '}
+                                                    {new Date(
+                                                        borrowing.borrow_date,
+                                                    ).toLocaleDateString()}
+                                                </p>
+                                                <p className="text-xs text-muted-foreground mt-1">
+                                                    {borrowing.borrowing_details.length}{' '}
+                                                    book(s)
+                                                </p>
+                                            </div>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                asChild
+                                            >
+                                                <Link
+                                                    href={`/borrowings/${borrowing.id}`}
+                                                >
+                                                    View
+                                                </Link>
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Top Borrowed Books</CardTitle>
+                            <CardDescription>
+                                Most frequently borrowed books
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {topBorrowedBooks.length === 0 ? (
+                                <p className="text-sm text-muted-foreground">
+                                    No data available.
+                                </p>
+                            ) : (
+                                <div className="space-y-3">
+                                    {topBorrowedBooks.map((book, index) => (
+                                        <div
+                                            key={book.id}
+                                            className="flex items-start justify-between rounded-lg border p-3"
+                                        >
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-2">
+                                                    <Badge variant="secondary">
+                                                        #{index + 1}
+                                                    </Badge>
+                                                    <p className="text-sm font-medium">
+                                                        {book.title}
+                                                    </p>
+                                                </div>
+                                                <p className="text-xs text-muted-foreground">
+                                                    by {book.author}
+                                                </p>
+                                            </div>
+                                            <Badge variant="outline">
+                                                {book.total_borrowed} times
+                                            </Badge>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </div>
@@ -302,103 +394,6 @@ export default function Dashboard({
                     </Card>
                 )}
 
-                <div className="grid gap-6 md:grid-cols-2">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Recent Borrowings</CardTitle>
-                            <CardDescription>
-                                Latest 5 borrowing transactions
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            {recentBorrowings.length === 0 ? (
-                                <p className="text-sm text-muted-foreground">
-                                    No recent borrowings.
-                                </p>
-                            ) : (
-                                <div className="space-y-3">
-                                    {recentBorrowings.map((borrowing) => (
-                                        <div
-                                            key={borrowing.id}
-                                            className="flex items-start justify-between rounded-lg border p-3"
-                                        >
-                                            <div className="flex-1">
-                                                <p className="text-sm font-medium">
-                                                    {borrowing.member.name}
-                                                </p>
-                                                <p className="text-xs text-muted-foreground">
-                                                    {borrowing.member.member_code}{' '}
-                                                    •{' '}
-                                                    {new Date(
-                                                        borrowing.borrow_date,
-                                                    ).toLocaleDateString()}
-                                                </p>
-                                                <p className="text-xs text-muted-foreground mt-1">
-                                                    {borrowing.borrowing_details.length}{' '}
-                                                    book(s)
-                                                </p>
-                                            </div>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                asChild
-                                            >
-                                                <Link
-                                                    href={`/borrowings/${borrowing.id}`}
-                                                >
-                                                    View
-                                                </Link>
-                                            </Button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Top Borrowed Books</CardTitle>
-                            <CardDescription>
-                                Most frequently borrowed books
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            {topBorrowedBooks.length === 0 ? (
-                                <p className="text-sm text-muted-foreground">
-                                    No data available.
-                                </p>
-                            ) : (
-                                <div className="space-y-3">
-                                    {topBorrowedBooks.map((book, index) => (
-                                        <div
-                                            key={book.id}
-                                            className="flex items-start justify-between rounded-lg border p-3"
-                                        >
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-2">
-                                                    <Badge variant="secondary">
-                                                        #{index + 1}
-                                                    </Badge>
-                                                    <p className="text-sm font-medium">
-                                                        {book.title}
-                                                    </p>
-                                                </div>
-                                                <p className="text-xs text-muted-foreground">
-                                                    by {book.author}
-                                                </p>
-                                            </div>
-                                            <Badge variant="outline">
-                                                {book.total_borrowed} times
-                                            </Badge>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-                </div>
-
                 <Card>
                     <CardHeader>
                         <CardTitle>Summary Statistics</CardTitle>
@@ -415,10 +410,10 @@ export default function Dashboard({
                             </div>
                             <div>
                                 <p className="text-sm text-muted-foreground">
-                                    Books Borrowed
+                                    Total Books
                                 </p>
                                 <p className="text-2xl font-bold">
-                                    {stats.total_books_borrowed}
+                                    {stats.total_books}
                                 </p>
                             </div>
                             <div>
@@ -431,10 +426,10 @@ export default function Dashboard({
                             </div>
                             <div>
                                 <p className="text-sm text-muted-foreground">
-                                    Total Categories
+                                    Total Members
                                 </p>
                                 <p className="text-2xl font-bold">
-                                    {stats.total_categories}
+                                    {stats.total_members}
                                 </p>
                             </div>
                         </div>

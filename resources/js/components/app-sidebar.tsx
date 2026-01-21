@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { BookOpen, Calendar, LayoutGrid, Tag, Users } from 'lucide-react';
 
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -24,20 +24,29 @@ const mainNavItems: NavItem[] = [
         href: dashboard(),
         icon: LayoutGrid,
     },
-];
-
-const footerNavItems: NavItem[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
+        title: 'Borrowings',
+        href: '/borrowings',
+        icon: Calendar,
     },
     {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
+        title: 'Members',
+        href: '/members',
+        icon: Users,
+    },
+    {
+        title: 'Books',
+        href: '/books',
         icon: BookOpen,
     },
+    {
+        title: 'Categories',
+        href: '/categories',
+        icon: Tag,
+    },
 ];
+
+const footerNavItems: NavItem[] = [];
 
 export function AppSidebar() {
     return (

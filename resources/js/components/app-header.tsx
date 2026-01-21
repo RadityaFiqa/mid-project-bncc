@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Menu, Search, Tag, Users } from 'lucide-react';
 
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -43,6 +43,26 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Borrowings',
+        href: '/borrowings',
+        icon: Calendar,
+    },
+    {
+        title: 'Members',
+        href: '/members',
+        icon: Users,
+    },
+    {
+        title: 'Books',
+        href: '/books',
+        icon: BookOpen,
+    },
+    {
+        title: 'Categories',
+        href: '/categories',
+        icon: Tag,
     },
 ];
 
