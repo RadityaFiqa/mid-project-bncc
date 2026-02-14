@@ -42,6 +42,8 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            // Correct base URL for production (set APP_URL=https://your-domain.com in .env to avoid Inertia ERR_NETWORK)
+            'appUrl' => config('app.url'),
         ];
     }
 }
