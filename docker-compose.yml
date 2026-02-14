@@ -1,0 +1,19 @@
+# PostgreSQL database for local development.
+# Run: docker compose up -d
+# Then set .env DB_* to use pgsql and connect to 127.0.0.1:5432
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: mid-project-bncc-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE:-mid_project_bncc}
+      POSTGRES_USER: ${POSTGRES_USER:-mid_project_bncc}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secret}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

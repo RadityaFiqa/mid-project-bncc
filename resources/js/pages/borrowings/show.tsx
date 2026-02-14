@@ -70,7 +70,7 @@ interface BorrowingShowProps {
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Borrowings', href: index().url },
+    { title: 'Borrowings', href: borrowingsRoutes.index().url },
     { title: 'Borrowing Details' },
 ];
 
@@ -92,7 +92,7 @@ export default function BorrowingShow({
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <Button variant="outline" size="sm" asChild>
-                            <Link href={index().url}>
+                            <Link href={borrowingsRoutes.index().url}>
                                 <ArrowLeftIcon />
                                 Back
                             </Link>

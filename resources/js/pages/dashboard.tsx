@@ -1,8 +1,9 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import {
     BookOpenIcon,
     CalendarIcon,
     LibraryIcon,
+    RefreshCwIcon,
     TagIcon,
     UsersIcon,
 } from 'lucide-react';
@@ -99,6 +100,8 @@ interface DashboardProps {
     monthlyBorrowings: MonthlyBorrowing[];
     statusDistribution: StatusDistribution[];
     booksByCategory: BooksByCategory[];
+    last_updated?: string;
+    success?: string;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -108,6 +111,19 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+function formatLastUpdated(iso?: string): string {
+    if (!iso) return '—';
+    try {
+        const date = new Date(iso);
+        return date.toLocaleString(undefined, {
+            dateStyle: 'medium',
+            timeStyle: 'short',
+        });
+    } catch {
+        return iso;
+    }
+}
+
 export default function Dashboard({
     stats,
     recentBorrowings,
@@ -115,20 +131,47 @@ export default function Dashboard({
     monthlyBorrowings,
     statusDistribution,
     booksByCategory,
+    last_updated,
+    success,
 }: DashboardProps) {
+    const handleRefresh = () => {
+        router.post('/dashboard/refresh');
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
 
             <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                    <Heading
-                        title="Dashboard"
-                        description="Overview of library management system"
-                    />
-                    <Button variant="outline" asChild>
-                        <Link href={index().url}>View All Borrowings</Link>
-                    </Button>
+                {success && (
+                    <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-200">
+                        {success}
+                    </div>
+                )}
+                <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                    <div>
+                        <Heading
+                            title="Dashboard"
+                            description="Overview of library management system"
+                        />
+                        <p className="mt-1 text-xs text-muted-foreground">
+                            Last updated: {formatLastUpdated(last_updated)}
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleRefresh}
+                            className="gap-2"
+                        >
+                            <RefreshCwIcon className="h-4 w-4" />
+                            Refresh data
+                        </Button>
+                        <Button variant="outline" asChild>
+                            <Link href={index().url}>View All Borrowings</Link>
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

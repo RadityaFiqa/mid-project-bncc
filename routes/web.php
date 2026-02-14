@@ -12,6 +12,7 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+    Route::post('dashboard/refresh', [App\Http\Controllers\DashboardController::class, 'refresh'])->name('dashboard.refresh');
 
     Route::resource('categories', App\Http\Controllers\CategoryController::class);
     Route::resource('books', App\Http\Controllers\BookController::class);

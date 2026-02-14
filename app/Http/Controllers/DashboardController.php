@@ -28,11 +28,13 @@ class DashboardController extends Controller
     /**
      * Display the main dashboard.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $data = Cache::remember(self::CACHE_KEY, self::CACHE_TTL, function () {
             return $this->getDashboardData();
         });
+
+        $data['success'] = $request->session()->get('success');
 
         return Inertia::render('dashboard', $data);
     }
@@ -139,8 +141,8 @@ class DashboardController extends Controller
                     ->where('borrowings.status', '=', 'returned');
             })
             ->groupBy('categories.id', 'categories.name')
-            ->havingRaw('total_borrowed > 0')
-            ->orderByDesc('total_borrowed')
+            ->havingRaw('COALESCE(SUM(borrowing_details.quantity), 0) > 0')
+            ->orderByRaw('COALESCE(SUM(borrowing_details.quantity), 0) DESC')
             ->take(5)
             ->get()
             ->map(fn ($category) => [
@@ -155,6 +157,17 @@ class DashboardController extends Controller
             'monthlyBorrowings' => $monthlyData,
             'statusDistribution' => $statusDistribution,
             'booksByCategory' => $booksByCategory,
+            'last_updated' => now()->toIso8601String(),
         ];
+    }
+
+    /**
+     * Refresh dashboard cache and redirect back.
+     */
+    public function refresh(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $this->refreshCache();
+
+        return redirect()->route('dashboard')->with('success', 'Dashboard data refreshed.');
     }
 }

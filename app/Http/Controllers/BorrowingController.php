@@ -273,6 +273,7 @@ class BorrowingController extends Controller
         ];
 
         // Books borrowed by category (sum of quantities)
+        // PostgreSQL does not allow SELECT aliases in HAVING/ORDER BY; use the expression.
         $booksByCategory = Category::query()
             ->select('categories.id', 'categories.name')
             ->selectRaw('COALESCE(SUM(borrowing_details.quantity), 0) as total_borrowed')
@@ -283,8 +284,8 @@ class BorrowingController extends Controller
                     ->where('borrowings.status', '=', 'returned');
             })
             ->groupBy('categories.id', 'categories.name')
-            ->havingRaw('total_borrowed > 0')
-            ->orderByDesc('total_borrowed')
+            ->havingRaw('COALESCE(SUM(borrowing_details.quantity), 0) > 0')
+            ->orderByRaw('COALESCE(SUM(borrowing_details.quantity), 0) DESC')
             ->take(5)
             ->get()
             ->map(fn ($category) => [

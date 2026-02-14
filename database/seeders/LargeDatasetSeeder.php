@@ -24,7 +24,6 @@ class LargeDatasetSeeder extends Seeder
         $borrowingsCount = 100000;
 
         DB::disableQueryLog();
-        $driver = DB::connection()->getDriverName();
 
         // Use Indonesian-ish locale (realistic names/addresses)
         $faker = \Faker\Factory::create('id_ID');
@@ -147,14 +146,14 @@ class LargeDatasetSeeder extends Seeder
                 ];
             }
 
+            // Get max id before insert so we know the range after (works on all drivers including PostgreSQL)
+            $maxIdBefore = (int) DB::table('borrowings')->max('id');
+
             // Insert borrowings in one go
             DB::table('borrowings')->insert($rows);
 
-            // Determine inserted ID range (driver-specific)
-            $pdoLastId = (int) DB::getPdo()->lastInsertId();
-            $firstId = $driver === 'sqlite'
-                ? ($pdoLastId - $batch + 1)
-                : $pdoLastId; // mysql returns first id for multi-row insert
+            // Inserted IDs are maxIdBefore+1 .. maxIdBefore+batch
+            $firstId = $maxIdBefore + 1;
 
             // Build details referencing those ids
             for ($offset = 0; $offset < $batch; $offset++) {

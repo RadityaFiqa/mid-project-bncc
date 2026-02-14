@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { PlusIcon, EyeIcon, History } from 'lucide-react';
+import { PlusIcon, EyeIcon, History, RotateCcwIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import Heading from '@/components/heading';
@@ -329,6 +329,27 @@ export default function BorrowingsIndex({
                                                 </td>
                                                 <td className="px-4 py-3 align-top">
                                                     <div className="flex items-center justify-end gap-2">
+                                                        {borrowing.status ===
+                                                            'borrowed' && (
+                                                            <Button
+                                                                variant="default"
+                                                                size="sm"
+                                                                asChild
+                                                            >
+                                                                <Link
+                                                                    href={show({
+                                                                        borrowing:
+                                                                            borrowing.id,
+                                                                    }).url}
+                                                                >
+                                                                    <RotateCcwIcon className="h-4 w-4" />
+                                                                    <span className="sr-only sm:not-sr-only sm:ml-1">
+                                                                        Return
+                                                                        Book
+                                                                    </span>
+                                                                </Link>
+                                                            </Button>
+                                                        )}
                                                         <Button
                                                             variant="outline"
                                                             size="sm"

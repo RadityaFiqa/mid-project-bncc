@@ -1,8 +1,10 @@
 import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
-import AppLogoIcon from '@/components/app-logo-icon';
 import { home } from '@/routes';
+
+const BINUS_LOGO_URL =
+    'https://upload.wikimedia.org/wikipedia/id/a/a2/Logo_Binus_University.png';
 
 interface AuthLayoutProps {
     name?: string;
@@ -25,7 +27,11 @@ export default function AuthSimpleLayout({
                             className="flex flex-col items-center gap-2 font-medium"
                         >
                             <div className="mb-1 flex h-9 w-9 items-center justify-center rounded-md">
-                                <AppLogoIcon className="size-9 fill-current text-[var(--foreground)] dark:text-white" />
+                                <img
+                                    src={BINUS_LOGO_URL}
+                                    alt="Binus"
+                                    className="size-9 object-contain"
+                                />
                             </div>
                             <span className="sr-only">{title}</span>
                         </Link>
